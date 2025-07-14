@@ -1,13 +1,18 @@
 import React, { useState, useMemo } from 'react';
 import { useUserContext } from '../context/UserContext';
-import { exportToCsv } from '../services/dataService';
+import { exportToXlsx } from '../services/dataService';
 import { User } from '../types';
-import { CopyIcon, CheckIcon, ExportIcon, ResetIcon, UploadIcon } from './icons';
+import { CopyIcon, CheckIcon, ExportIcon, ResetIcon, UploadIcon, SunIcon, MoonIcon } from './icons';
 
 const USERS_PER_VOLUNTEER = 40;
 
-const Dashboard: React.FC = () => {
-  const { users, loading, resetData, loadUsersFromFile } = useUserContext();
+interface DashboardProps {
+  theme: string;
+  toggleTheme: () => void;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ theme, toggleTheme }) => {
+  const { users, loading, resetData, loadUsersFromFile, columnHeaders } = useUserContext();
   const [selectedVolunteer, setSelectedVolunteer] = useState<number>(1);
   const [copiedLink, setCopiedLink] = useState<number | null>(null);
 
@@ -35,7 +40,7 @@ const Dashboard: React.FC = () => {
   const handleExport = () => {
     const updatedUsers = users.filter(u => u.status === 'Updated');
     if (updatedUsers.length > 0) {
-      exportToCsv(updatedUsers);
+      exportToXlsx(updatedUsers, 'updated_user_records.xlsx');
     } else {
       alert("No updated records to export.");
     }
@@ -61,18 +66,23 @@ const Dashboard: React.FC = () => {
     <div className="container mx-auto p-4 md:p-8">
       <header className="flex flex-col md:flex-row justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4 md:mb-0">Survey Admin Dashboard</h1>
-        {users.length > 0 && (
-          <div className="flex items-center space-x-2">
-            <button onClick={handleExport} className="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition-colors duration-200">
-              <ExportIcon className="w-5 h-5 mr-2" />
-              Export Updated
+        <div className="flex items-center space-x-2">
+            <button onClick={toggleTheme} className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+              {theme === 'light' ? <MoonIcon className="h-6 w-6" /> : <SunIcon className="h-6 w-6" />}
             </button>
-            <button onClick={resetData} className="flex items-center bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 transition-colors duration-200">
-              <ResetIcon className="w-5 h-5 mr-2" />
-              Reset Data
-            </button>          
-          </div>
-        )}
+          {users.length > 0 && (
+            <>
+              <button onClick={handleExport} className="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition-colors duration-200">
+                <ExportIcon className="w-5 h-5 mr-2" />
+                Export Updated
+              </button>
+              <button onClick={resetData} className="flex items-center bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 transition-colors duration-200">
+                <ResetIcon className="w-5 h-5 mr-2" />
+                Reset Data
+              </button>
+            </>
+          )}
+        </div>
       </header>
 
       {users.length === 0 ? (
@@ -81,7 +91,7 @@ const Dashboard: React.FC = () => {
                 <UploadIcon className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">Upload Your User Data</h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Upload an .xlsx, .xls, or .csv file to begin.</p>
-                <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Required columns: Name, Email, Phone, Gender, City, Country</p>
+                <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Columns can have English/Tamil headers.</p>
                 <div className="mt-6">
                 <input
                     type="file"
@@ -117,10 +127,10 @@ const Dashboard: React.FC = () => {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID / ஐடி</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{columnHeaders.name || 'Name'}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status / நிலை</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action / செயல்</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
