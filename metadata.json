@@ -1,0 +1,5 @@
+{
+  "name": "Survey Admin Dashboard",
+  "description": "An admin tool to manage survey participants, track their update status, and facilitate communication through unique, shareable links. Built with React, Tailwind CSS, and HashRouter for seamless deployment.",
+  "requestFramePermissions": []
+}
