@@ -33,30 +33,33 @@ export const clearUsersFromStorage = (): void => {
 // --- Excel File Operations ---
 
 export const parseExcelFile = (file: File): Promise<UserRecord[]> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const data = e.target?.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const json: UserData[] = XLSX.utils.sheet_to_json(worksheet);
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = e.target?.result;
+                const workbook = XLSX.read(data, { type: 'binary' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
 
-        const newRecords: UserRecord[] = json.map((row, index) => ({
-          id: `${Date.now()}-${index}`, // Simple unique ID
-          volunteerId: `V${(index % TOTAL_VOLUNTEERS) + 1}`,
-          status: 'Pending',
-          data: row,
-        }));
-        resolve(newRecords);
-      } catch (error) {
-        reject(error);
-      }
-    };
-    reader.onerror = (error) => reject(error);
-    reader.readAsBinaryString(file);
-  });
+                // FIX: Add `defval: ''` to preserve empty cells/columns
+                const json: UserData[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+                const newRecords: UserRecord[] = json.map((row, index) => ({
+                    id: `${Date.now()}-${index}`, // Simple unique ID
+                    volunteerId: `V${(index % TOTAL_VOLUNTEERS) + 1}`,
+                    status: 'Pending',
+                    data: row,
+                }));
+
+                resolve(newRecords);
+            } catch (error) {
+                reject(error);
+            }
+        };
+        reader.onerror = (error) => reject(error);
+        reader.readAsBinaryString(file);
+    });
 };
 
 export const exportUsersToExcel = (users: UserRecord[]): void => {
