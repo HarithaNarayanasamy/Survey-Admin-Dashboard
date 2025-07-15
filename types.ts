@@ -1,20 +1,22 @@
+export enum Role {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  VOLUNTEER = 'VOLUNTEER',
+}
 
-export type UserStatus = 'Updated' | 'Not Updated';
+export interface AuthUser {
+  username: string;
+  role: Role;
+  volunteerId?: string; // e.g., 'V1', 'V2'
+}
 
-// Define the union type explicitly for type safety
-export type Gender = 'Male' | 'Female' | 'Other' | 'Prefer not to say';
+export interface UserData {
+  // Dynamic properties from Excel file
+  [key: string]: string | number;
+}
 
-// Define a constant array for use in UI elements like dropdowns
-export const Genders: Gender[] = ['Male', 'Female', 'Other', 'Prefer not to say'];
-
-export interface User {
-  id: number;
-  volunteerId: number;
-  name: string;
-  email: string;
-  phone: string;
-  gender: Gender;
-  city: string;
-  country: string;
-  status: UserStatus;
+export interface UserRecord {
+  id: string;
+  volunteerId: string;
+  status: 'Pending' | 'Updated';
+  data: UserData;
 }

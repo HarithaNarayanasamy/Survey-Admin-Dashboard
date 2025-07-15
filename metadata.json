@@ -1,5 +1,5 @@
 {
-  "name": "Survey Admin Dashboard",
-  "description": "An admin tool to manage survey participants, track their update status, and facilitate communication through unique, shareable links. Built with React, Tailwind CSS, and HashRouter for seamless deployment.",
+  "name": "Volunteer Data Management Portal",
+  "description": "An application for Super Admins to upload user data and for volunteers to manage and update records via shareable forms.",
   "requestFramePermissions": []
 }
